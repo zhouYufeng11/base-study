@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var $ = (function() {
+            var o = window.XMLHttpRequest ? new XMLHttpRequest : new ActiveXObject('Miscrosoft.XMLHTTP');   //  配置兼容性
+            if(!o) {    //  如果上述的都没有，则说明你的浏览器不支持异步操作
+                throw new Error('你的浏览器不支持异步发起http请求');
+            }
+
+            //  配置参数
+            function _doAjax(opt) {
+                var opt = opt || {},   //   传过来的配置项
+                    type = (opt.type || 'GET').toUpperCase(),   //  将请求的数据类型转换成大写
+                    async = opt.async || true,  //  是否进行异步操作，默认进行异步操作
+                    url = opt.url, //   请求的数据地址
+                    data = opt.data, // 传递给后端的请求数据
+                    error = opt.error || function() {}, //  请求失败的处理函数
+                    success = opt.success || function() {};
+                if(!url) {
+                    throw new Error('你没用填写url');
+                }
+                //  发送http请求 request  发送设置
+                o.open(type, url, async);
+                //  如果是post 请求，需要添加请求头  content 内容
+                //  application 申请 encoded 编码，让服务器知道当前的请求方式是post请求
+                type === 'POST' && o.setRequestHeader('Content-type', application/x-www-form-urlencoded);
+                //  发送请求
+                o.send(type === 'GET' ? null : formatDatas(data)); // 发送请求数据   主要针对post 注意发送的数据是字符串
+                
+                //  挂载到XMLHttpRequest对象上的事件
+                o.onreadystatechange = function() {
+                    if(o.readyState === 4 && o.status === 200) {  //  请求成功并返回数据
+                        success(JSON.parse(o.responseText));  
+                    } else if(o.status === 404) {   //  服务器请求失败
+                        error();
+                    }
+                    complete();
+                }
+                //  将传过来来的请求对象进行字符串拼接
+                function formatDatas(opt) {
+                    var str = '';
+                    for(var key in opt) {
+                        str += key + '=' + opt[key] + '&';
+                    }
+                    //  将最后多余那个 & 替换掉
+                    return str.replace(/&$/, '');  //  将结尾的 & 替换掉 注意他返回的是一个新的字符串
+                }
+            }
+
+            return {
+                ajax: function(opt) {
+                    _doAjax(opt);
+                },
+                get: function(url, data, callback) {
+                    _doAjax({
+                        url: url,
+                        data: data,
+                        callback: callback
+                    });
+                },
+                post: function(url, callback) {
+                    _doAjax({
+                        url: url,
+                        callback: callback
+                    });
+                }
+            }
+        })();
+
+        $.ajax({
+            url: '172.0.0.1',
+            data: {
+                name: '周大帅',
+                type: 'post',
+                age: 18
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+body{
+    margin: 0;
+}
+
+input{
+    outline: none;
+    border: none;
+    box-sizing: border-box;     /* 控制文字区域 */
+}
